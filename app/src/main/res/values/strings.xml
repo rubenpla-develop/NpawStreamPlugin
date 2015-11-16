@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">NPAW-Streamer</string>
+    <string name="media_player_activity">MediaPlayer</string>
+    <string name="video_view_Activity">VideoView</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="media_player_label">Launch MediaPlayer</string>
+    <string name="video_view_label">Launch VideoView</string>
+</resources>

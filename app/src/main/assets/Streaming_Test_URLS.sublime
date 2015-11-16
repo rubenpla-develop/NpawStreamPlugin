@@ -1,0 +1,17 @@
+
+HTTP streaming:
+http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4
+http://www-itec.uni-klu.ac.at/dash/js/content/bunny_4000.webm
+DASH streaming:
+all DASH MPDs on the ITEC DASH-JS page:
+MP4 3 rep 50kbps to 150kbps: http://www-itec.uni-klu.ac.at/dash/js/content/bunny_ibmff_240.mpd
+MP4 7 rep 200kbps to 700kbps: http://www-itec.uni-klu.ac.at/dash/js/content/bunny_ibmff_360.mpd
+MP4 4 rep 900kbps to 2000kbps: http://www-itec.uni-klu.ac.at/dash/js/content/bunny_ibmff_720.mpd
+MP4 6 rep 2500kbps to 8000kbps: http://www-itec.uni-klu.ac.at/dash/js/content/bunny_ibmff_1080.mpd
+WebM 5 rep 200 kbps to 2000 kbps multiplexed audio: http://www-itec.uni-klu.ac.at/dash/js/content/sintel_multi_rep.mpd
+WebM 7 rep 200 kbps to 4700 kbps multiplexed audio: http://www-itec.uni-klu.ac.at/dash/js/content/bigbuckbunny.mpd
+WebM 7 rep 1000 kbps to 8000 kbps multiplexed audio: http://www-itec.uni-klu.ac.at/dash/js/content/bigbuckbunny_1080p.mpd
+MP4 8 rep 250 to 6000 kbps separate audio: http://dj9wk94416cg5.cloudfront.net/sintel2/sintel.mpd
+DASH-IF test vectors (not all working, evaluation protocol)
+Akamai live stream: http://24x7dash-i.akamaihd.net/dash/live/900080/elemental/dash.mpd
+IRT reference clips (not yet tested)
