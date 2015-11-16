@@ -17,7 +17,7 @@ public class NpawMediaPlayer extends MediaPlayer implements MediaPlayer.OnPrepar
 
     public NpawMediaPlayer()
     {
-
+        super();
     }
 
     @Override

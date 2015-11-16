@@ -1,5 +1,6 @@
 package org.npawstreamer.npaw_streamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import org.npawstreamer.npaw_streamer.activity.MediaPlayerActivity;
 import org.npawstreamer.npaw_streamer.utils.Const;
 
 import butterknife.Bind;
@@ -76,12 +78,12 @@ public class NpawActivity extends AppCompatActivity
 
     private void launchStreamProcess(String urlMovie, int code)
     {
-//        Intent movieIntent = null;
+        Intent movieIntent = null;
         if (code == 1)
         {
             Log.i(TAG, "MediaPlayer Lanzado");
-//            movieIntent = new Intent(this, MediaPlayerActivity.class)
-//                    .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
+            movieIntent = new Intent(this, MediaPlayerActivity.class)
+                    .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
         } else if (code == 2)
         {
             Log.i( TAG , "VideoView Lanzado");
@@ -89,7 +91,7 @@ public class NpawActivity extends AppCompatActivity
 //                    .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
         }
 
-//        startActivity(movieIntent);
+        startActivity(movieIntent);
     }
 
     @OnClick(R.id.mp_button)
