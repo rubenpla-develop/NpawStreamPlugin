@@ -28,12 +28,14 @@
             android:name=".activity.MediaPlayerActivity"
             android:label="@string/video_view_Activity"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
 
         <activity
             android:name=".activity.VideoViewActivity"
             android:label="@string/video_view_Activity"
             android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="landscape"
             android:configChanges="keyboardHidden|orientation|screenSize"/>
     </application>
 
