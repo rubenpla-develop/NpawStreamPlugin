@@ -3,15 +3,11 @@ package view;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.MediaController;
 import android.widget.Toast;
-
-import callbacks.NpawMediaPlayerCallbacks;
 
 /**
  * Created by Ruben on 16/11/2015.
@@ -22,34 +18,33 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
     private String videoUrl;
 
     private PowerManager.WakeLock mWakeLock = null;
-    private Handler handler;
+    //    private Handler handler;
     private Context context;
-    private SurfaceView mSurfaceView;
-
     private MediaController mMediaController;
 
     private OnPreparedListener mOnPreparedListener;
     private OnSeekCompleteListener mOnSeekCompleteListener;
+    private OnSeekListener mOnSeekListener;
     private OnCompletionListener mOnCompletionListener;
     private OnErrorListener mOnErrorListener;
     private OnInfoListener mOnInfoListener;
     private OnBufferingUpdateListener mOnBufferingUpdateListener;
     private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+    private onPrepareMediaPlayerControlListener mOnPrepareMediaPlayerControlListener;
     private MediaController.MediaPlayerControl mMediaPlayerControl;
     private SurfaceHolder.Callback mSurfaceHolderCallback;
-    private NpawMediaPlayerCallbacks npawMplayerCallbacks;
+//    private NpawMediaPlayerCallbacks npawMplayerCallbacks;
 
     public NpawMediaPlayer()
     {
         super();
     }
 
-    public void initMediaPLayer(Context context, String url, SurfaceView surfaceView)
+    public void initMediaPlayer(Context context, String url)
     {
         Log.i(TAG, "initMediaPlayer");
 
         this.context = context;
-        mSurfaceView = surfaceView;
         videoUrl = url;
 
         mMediaController = new MediaController(context);
@@ -87,28 +82,28 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
             public int getDuration()
             {
                 Log.d(TAG, "mMediaController getDuration()");
-                return getDuration();
+                return 0;
             }
 
             @Override
             public int getCurrentPosition()
             {
                 Log.d(TAG, "mMediaController getCurrentPosition()");
-                return getCurrentPosition();
+                return 0;
             }
 
             @Override
             public void seekTo(int pos)
             {
                 Log.d(TAG, "mMediaController seekTo()");
-                seekTo(pos);
+                //seekTo(pos);
             }
 
             @Override
             public boolean isPlaying()
             {
                 Log.d(TAG, "mMediaController isPlaying()");
-                return isPlaying();
+                return false;
             }
 
             @Override
@@ -163,7 +158,7 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
                     Log.e("TAG", "SurfaceCreated error : " + e.getMessage());
                 }
 
-                start();
+//                start();
             }
 
             @Override
@@ -182,14 +177,6 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         };
     }
 
-//    private void prepareMediaPlayerControl()
-//    {
-//        Log.i(TAG, "prepareMediaPlayerCOntrol()");
-//
-//        mMediaController.setMediaPlayer(mMediaPlayerControl);
-//        mMediaController.setAnchorView(mSurfaceView);
-//        mMediaController.setEnabled(true);
-//    }
 
 
     public SurfaceHolder.Callback callBackIntoHolder()
@@ -205,7 +192,7 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         this.mSurfaceHolderCallback = holderCallback;
     }
 
-    public SurfaceHolder.Callback getSurfaceHOlderCallBack()
+    public SurfaceHolder.Callback getSurfaceHolderCallBack()
     {
         return mSurfaceHolderCallback;
     }
@@ -237,6 +224,27 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         return mMediaController;
     }
 
+    public interface onPrepareMediaPlayerControlListener
+    {
+        void onPrepareMediaPlayerControl(NpawMediaPlayer mp);
+    }
+
+    public void setOnPrepareMediaPlayerControlListener(onPrepareMediaPlayerControlListener listener)
+    {
+        mOnPrepareMediaPlayerControlListener = listener;
+    }
+
+    public interface OnSeekListener
+    {
+
+        public void onSeek(MediaPlayer mp);
+    }
+
+    public void setOnSeekListener(OnSeekListener listener)
+    {
+        mOnSeekListener = listener;
+    }
+
     public void setMediaController(MediaController mc)
     {
         this.mMediaController = mc;
@@ -244,25 +252,18 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
 
     private void setMediaPlayerListeners()
     {
-        mOnPreparedListener = new OnPreparedListener()
-        {
-            @Override
-            public void onPrepared(MediaPlayer mp)
-            {
-                Log.w(TAG, "MediaPlayer onPrepared()");
-                npawMplayerCallbacks.onPrepareMediaPlayerControl();
-                handler.post(new Runnable()
-                {
-                    public void run()
-                    {
-                        mMediaController.setEnabled(true);
-                        mMediaController.show();
-                    }
-                });
-            }
-        };
-
-        setOnPreparedListener(mOnPreparedListener);
+//        mOnPreparedListener = new OnPreparedListener()
+//        {
+//            @Override
+//            public void onPrepared(MediaPlayer mp)
+//            {
+//                Log.w(TAG, "MediaPlayer onPrepared()");
+////                npawMplayerCallbacks.onPrepareMediaPlayerControl();
+//                mOnPrepareMediaPlayerControlListener.onPrepareMediaPlayerControl(NpawMediaPlayer.this);
+//            }
+//        };
+//
+//        setOnPreparedListener(mOnPreparedListener);
 
         mOnSeekCompleteListener = new OnSeekCompleteListener()
         {
@@ -292,8 +293,6 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
             public boolean onError(MediaPlayer mp, int what, int extra)
             {
                 Log.e(TAG, "default OnError()");
-
-
                 String whatName = "";
                 String extraName = "";
 
@@ -309,7 +308,7 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
                         whatName = "NOT SPECIFIC ERROR";
                         break;
                 }
-                
+
                 switch (extra)
                 {
                     case MEDIA_ERROR_IO:

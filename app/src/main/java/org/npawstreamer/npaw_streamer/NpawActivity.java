@@ -81,7 +81,7 @@ public class NpawActivity extends AppCompatActivity
         Intent movieIntent = null;
         if (code == 1)
         {
-            Log.i(TAG, "MediaPlayer Lanzado");
+            Log.i(TAG, "MediaPlayer Activity");
             movieIntent = new Intent(this, MediaPlayerActivity.class)
                     .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
         } else if (code == 2)

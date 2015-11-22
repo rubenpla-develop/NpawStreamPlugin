@@ -1,10 +1,16 @@
 package org.npawstreamer.npaw_streamer.activity;
 
+import android.content.Context;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.MediaController;
 
 import org.npawstreamer.npaw_streamer.R;
 import org.npawstreamer.npaw_streamer.utils.Const;
@@ -13,10 +19,21 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import view.NpawMediaPlayer;
 
-public class MediaPlayerActivity extends AppCompatActivity
+public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaPlayer.OnPreparedListener
 {
+    final public static String TAG = MediaPlayerActivity.class.getSimpleName();
+    private Context ctx;
+
     @Bind(R.id.surface_view)
     SurfaceView surfaceView;
+
+    private SurfaceHolder holder;
+    private NpawMediaPlayer mediaPlayer;
+    private MediaController mController;
+    private NpawMediaPlayer.onPrepareMediaPlayerControlListener mOnPrepareMediaControlListener;
+    private MediaController.MediaPlayerControl mMediaPlayerControl;
+    private Handler handler;
+    private String videoUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,41 +43,102 @@ public class MediaPlayerActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-        final String videoUri = getIntent().getStringExtra(Const.EXTRA_MOVIE_PARAM);
+        ctx = this;
 
-        SurfaceHolder holder = surfaceView.getHolder();
+        videoUri = getIntent().getStringExtra(Const.EXTRA_MOVIE_PARAM);
 
-        //MediaPlayer object creation
-        final NpawMediaPlayer mediaPlayer = new NpawMediaPlayer();
+        holder = surfaceView.getHolder();
 
-        holder.addCallback(new SurfaceHolder.Callback() {
+        mediaPlayer = new NpawMediaPlayer();
+
+        mediaPlayer.initMediaPlayer(ctx, videoUri);
+        holder.addCallback(mediaPlayer.callBackIntoHolder());
+        mController = mediaPlayer.getMediaController();
+        mMediaPlayerControl = new MediaController.MediaPlayerControl()
+        {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                mediaPlayer.setDisplay(holder);
-                try {
-                    mediaPlayer.setDataSource(videoUri);
-                    mediaPlayer.prepare();
-                } catch (Exception e) {}
+            public void start()
+            {
                 mediaPlayer.start();
             }
 
             @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                mediaPlayer.stop();
-                mediaPlayer.release();
+            public void pause()
+            {
+                mediaPlayer.pause();
             }
 
             @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+            public int getDuration()
+            {
+                return mediaPlayer.getDuration();
             }
-        });
+
+            @Override
+            public int getCurrentPosition()
+            {
+                return mediaPlayer.getCurrentPosition();
+            }
+
+            @Override
+            public void seekTo(int pos)
+            {
+                mediaPlayer.seekTo(pos);
+            }
+
+            @Override
+            public boolean isPlaying()
+            {
+                return mediaPlayer.isPlaying();
+            }
+
+            @Override
+            public int getBufferPercentage()
+            {
+                return 0;
+            }
+
+            @Override
+            public boolean canPause()
+            {
+                return true;
+            }
+
+            @Override
+            public boolean canSeekBackward()
+            {
+                return true;
+            }
+
+            @Override
+            public boolean canSeekForward()
+            {
+                return true;
+            }
+
+            @Override
+            public int getAudioSessionId()
+            {
+                return mediaPlayer.getAudioSessionId();
+            }
+        };
+        mediaPlayer.setOnPreparedListener(this);
+        handler = new Handler();
+
+        if (savedInstanceState != null)
+        {
+            Log.i(TAG, "savedInstanceState: " + savedInstanceState.isEmpty());
+        } else
+        {
+            mediaPlayer.setMediaPlayerAdjustements();
+        }
     }
 
     @Override
     protected void onStop()
     {
         super.onStop();
+        mediaPlayer.release();
     }
 
     @Override
@@ -85,6 +163,12 @@ public class MediaPlayerActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
+        if (mediaPlayer != null)
+        {
+            outState.putString(Const.EXTRA_MOVIE_URL, videoUri);
+            outState.putBoolean(Const.EXTRA_MOVIE_ISPLAYING, mediaPlayer.isPlaying());
+            outState.putInt(Const.EXTRA_MOVIE_POSITION, mediaPlayer.getCurrentPosition());
+        }
     }
 
     @Override
@@ -97,6 +181,36 @@ public class MediaPlayerActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
+        Log.w(TAG, "onPause()");
+        mediaPlayer.pause();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        Log.d(TAG, "surfaceHolder.callBack.onTouchEvent()");
+        mController.show();
+        return false;
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp)
+    {
+        Log.w(TAG, "MediaPlayer onPrepared()");
+
+        mController.setMediaPlayer(mMediaPlayerControl);
+        mController.setAnchorView(surfaceView);
+        mController.setEnabled(true);
+
+        mediaPlayer.start();
+
+        handler.post(new Runnable()
+        {
+            public void run()
+            {
+                mController.setEnabled(true);
+                mController.show();
+            }
+        });
+    }
 }
