@@ -1,6 +1,7 @@
 package view;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -13,22 +14,12 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG = NpawVideoView.class.getSimpleName();
     private Context mContext;
 
-    private NpawMediaPlayer.OnPreparedListener mOnPreparedListener;
-    private NpawMediaPlayer.OnSeekListener mOnSeekListener;
-    private NpawMediaPlayer.OnSeekCompleteListener mOnSeekCompleteListener;
-    private NpawMediaPlayer.OnCompletionListener mOnCompletionListener;
-    private NpawMediaPlayer.OnErrorListener mOnErrorListener;
-    private NpawMediaPlayer.OnInfoListener mOnInfoListener;
-    private NpawMediaPlayer.OnBufferingUpdateListener mOnBufferingUpdateListener;
-
     private NpawMediaPlayer mPlayer;
     private MediaController mMediaController;
     private SurfaceHolder mSurfaceHolder;
     private String videoUrl;
     private int mVideoWidth;
     private int mVideoHeight;
-
-    private NpawMediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener;
 
     public NpawVideoView(Context context)
     {
@@ -80,14 +71,6 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
         mPlayer.initMediaPlayer(mContext, videoUrl);
         mPlayer.setDisplay(mSurfaceHolder);
         mPlayer.setMediaPlayerAdjustements();
-//        mPlayer.setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
-//        mPlayer.setOnPreparedListener(mOnPreparedListener);
-//        mPlayer.setOnSeekListener(mOnSeekListener);
-//        mPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
-//        mPlayer.setOnCompletionListener(mOnCompletionListener);
-//        mPlayer.setOnErrorListener(mOnErrorListener);
-//        mPlayer.setOnInfoListener(mOnInfoListener);
-//        mPlayer.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
     }
 
     public NpawMediaPlayer getMediaPlayer()
@@ -100,6 +83,7 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
     {
         mSurfaceHolder = holder;
         launchVideo();
+        mPlayer.prepareAsync();
     }
 
     @Override
@@ -129,6 +113,10 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
     public void pause()
     {
         mPlayer.pause();
+        mPlayer.getPlayStats().increasePauses();
+        mPlayer.showPausesStat();
+        mPlayer.startTimeElapse();
+        Log.i(TAG, "PAUSES : " + mPlayer.getPlayStats().getPauses());
     }
 
     @Override
@@ -185,39 +173,43 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
         return mPlayer.getAudioSessionId();
     }
 
-    public void setOnPreparedListener(NpawMediaPlayer.OnPreparedListener l)
+    public void setErrorListener(MediaPlayer.OnErrorListener l)
     {
-        this.mOnPreparedListener = l;
+        getMediaPlayer().setErrorListener(l);
     }
 
-//    public void setOnSeekListener(MediaPlayer.OnSeekListener l) {
-//        this.mOnSeekListener = l;
-//    }
-
-    public void setOnSeekCompleteListener(NpawMediaPlayer.OnSeekCompleteListener l)
+    public void setPreparedListener(MediaPlayer.OnPreparedListener l)
     {
-        this.mOnSeekCompleteListener = l;
+        getMediaPlayer().setPreparedListener(l);
     }
 
-    public void setOnCompletionListener(NpawMediaPlayer.OnCompletionListener l)
+    public void setInfoListener(MediaPlayer.OnInfoListener l)
     {
-        this.mOnCompletionListener = l;
+        getMediaPlayer().setInfoListener(l);
     }
 
-    public void setOnBufferingUpdateListener(NpawMediaPlayer.OnBufferingUpdateListener l)
+    public void setSeekCompleteListener(MediaPlayer.OnSeekCompleteListener l)
     {
-        this.mOnBufferingUpdateListener = l;
+        getMediaPlayer().setSeekCompleteListener(l);
     }
 
-    public void setOnErrorListener(NpawMediaPlayer.OnErrorListener l)
+    public void setBufferingUpdateListener(MediaPlayer.OnBufferingUpdateListener l)
     {
-        this.mOnErrorListener = l;
+        getMediaPlayer().setBufferingUpdateListener(l);
     }
 
-    public void setOnInfoListener(NpawMediaPlayer.OnInfoListener l)
+    public void setVideoSizeChangedListener(MediaPlayer.OnVideoSizeChangedListener l)
     {
-        this.mOnInfoListener = l;
+        getMediaPlayer().setVideoSizeChangedListener(l);
     }
 
+    public void filterErrorListenerResult(int what, int extra)
+    {
+        getMediaPlayer().filterOnErrorListenerResult(what, extra);
+    }
 
+    public void filterInfoListenerResult(int what, int extra)
+    {
+        getMediaPlayer().filterOnInfoListenerResult(what, extra);
+    }
 }
