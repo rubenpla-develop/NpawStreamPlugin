@@ -9,10 +9,12 @@ import android.view.SurfaceHolder;
 import android.widget.MediaController;
 import android.widget.Toast;
 
+import object.PlayStats;
+
 /**
  * Created by Ruben on 16/11/2015.
  */
-public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.MediaPlayerControl*/
+public class NpawMediaPlayer extends MediaPlayer
 {
     private static final String TAG = NpawMediaPlayer.class.getSimpleName();
     private String videoUrl;
@@ -21,19 +23,18 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
     //    private Handler handler;
     private Context context;
     private MediaController mMediaController;
+    private PlayStats playStats;
 
-    private OnPreparedListener mOnPreparedListener;
-    private OnSeekCompleteListener mOnSeekCompleteListener;
-    private OnSeekListener mOnSeekListener;
-    private OnCompletionListener mOnCompletionListener;
-    private OnErrorListener mOnErrorListener;
-    private OnInfoListener mOnInfoListener;
-    private OnBufferingUpdateListener mOnBufferingUpdateListener;
-    private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
-    private onPrepareMediaPlayerControlListener mOnPrepareMediaPlayerControlListener;
+    public OnPreparedListener mOnPreparedListener;
+    public OnSeekCompleteListener mOnSeekCompleteListener;
+    public OnSeekListener mOnSeekListener;
+    public OnCompletionListener mOnCompletionListener;
+    public OnErrorListener mOnErrorListener;
+    public OnInfoListener mOnInfoListener;
+    public OnBufferingUpdateListener mOnBufferingUpdateListener;
+    public OnVideoSizeChangedListener mOnVideoSizeChangedListener;
     private MediaController.MediaPlayerControl mMediaPlayerControl;
     private SurfaceHolder.Callback mSurfaceHolderCallback;
-//    private NpawMediaPlayerCallbacks npawMplayerCallbacks;
 
     public NpawMediaPlayer()
     {
@@ -46,6 +47,7 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
 
         this.context = context;
         videoUrl = url;
+        playStats = new PlayStats();
 
         mMediaController = new MediaController(context);
     }
@@ -55,88 +57,7 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         setScreenOnWhilePlaying(true);
         setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-        setMediaPlayerListeners();
-    }
-
-    public void initMediaPlayerControl()
-    {
-        Log.i(TAG, "InitMediaPlayerControl()");
-
-        mMediaPlayerControl = new MediaController.MediaPlayerControl()
-        {
-            @Override
-            public void start()
-            {
-                Log.d(TAG, "mMediaController start()");
-                start();
-            }
-
-            @Override
-            public void pause()
-            {
-                Log.d(TAG, "mMediaController pause()");
-                pause();
-            }
-
-            @Override
-            public int getDuration()
-            {
-                Log.d(TAG, "mMediaController getDuration()");
-                return 0;
-            }
-
-            @Override
-            public int getCurrentPosition()
-            {
-                Log.d(TAG, "mMediaController getCurrentPosition()");
-                return 0;
-            }
-
-            @Override
-            public void seekTo(int pos)
-            {
-                Log.d(TAG, "mMediaController seekTo()");
-                //seekTo(pos);
-            }
-
-            @Override
-            public boolean isPlaying()
-            {
-                Log.d(TAG, "mMediaController isPlaying()");
-                return false;
-            }
-
-            @Override
-            public int getBufferPercentage()
-            {
-                Log.d(TAG, "mMediaController getBufferPercentage()");
-                return 0;
-            }
-
-            @Override
-            public boolean canPause()
-            {
-                return true;
-            }
-
-            @Override
-            public boolean canSeekBackward()
-            {
-                return true;
-            }
-
-            @Override
-            public boolean canSeekForward()
-            {
-                return true;
-            }
-
-            @Override
-            public int getAudioSessionId()
-            {
-                return 0;
-            }
-        };
+//        setMediaPlayerListeners();
     }
 
     public void initSurfaceHolder()
@@ -177,8 +98,6 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         };
     }
 
-
-
     public SurfaceHolder.Callback callBackIntoHolder()
     {
         Log.i(TAG, "callBackIntoHolder()");
@@ -197,18 +116,6 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         return mSurfaceHolderCallback;
     }
 
-    public MediaController.MediaPlayerControl withMediaPlayerControl(boolean loadMpc)
-    {
-        Log.i(TAG, "withMediaPLayerControl()");
-
-        if (loadMpc)
-        {
-            initMediaPlayerControl();
-        }
-
-        return mMediaPlayerControl;
-    }
-
     public void setMediaPlayerControl(MediaController.MediaPlayerControl mpc)
     {
         this.mMediaPlayerControl = mpc;
@@ -224,19 +131,122 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         return mMediaController;
     }
 
-    public interface onPrepareMediaPlayerControlListener
+    public PlayStats getPlayStats()
     {
-        void onPrepareMediaPlayerControl(NpawMediaPlayer mp);
+        return playStats;
     }
 
-    public void setOnPrepareMediaPlayerControlListener(onPrepareMediaPlayerControlListener listener)
+    public void filterOnErrorListenerResult(int what, int extra)
     {
-        mOnPrepareMediaPlayerControlListener = listener;
+        Log.e(TAG, "default OnError()");
+        String whatName = "";
+        String extraName = "";
+
+        switch (what)
+        {
+            case MEDIA_ERROR_SERVER_DIED:
+                whatName = "MEDIA_ERROR_SERVER_DIED";
+                break;
+            case MEDIA_ERROR_UNKNOWN:
+                whatName = "MEDIA_ERROR_DOWNLOAD";
+                break;
+            default:
+                whatName = "NOT SPECIFIC ERROR";
+                break;
+        }
+
+        switch (extra)
+        {
+            case MEDIA_ERROR_IO:
+                extraName = "MEDIA_ERROR_IO";
+                break;
+            case MEDIA_ERROR_MALFORMED:
+                extraName = "MEDIA_ERROR_MALFORMED";
+                break;
+            case MEDIA_ERROR_TIMED_OUT:
+                extraName = "MEDIA_ERROR_TIMED_OUT";
+                break;
+            case MEDIA_ERROR_UNSUPPORTED:
+                extraName = "MEDIA_ERROR_UNSUPPORTED";
+                break;
+            default:
+                extraName = "NOT SPECIFIC ERROR";
+                break;
+        }
+
+        Toast.makeText(context.getApplicationContext(),
+                "Cannot play the video, see logcat for the detailed exception",
+                Toast.LENGTH_LONG).show();
+        Log.e(TAG, "what : " + whatName + "/ extra : " + extraName);
+
+//                mProgress.setVisibility(View.GONE);
+        mMediaController.setEnabled(false);
+    }
+
+    public void filterOnInfoListenerResult(int what, int extra)
+    {
+        String whatName = "";
+        String extraName = "";
+        switch (what)
+        {
+            case MEDIA_INFO_BUFFERING_END:
+                whatName = "MEDIA_INFO_BUFFERING_END";
+                break;
+            case MEDIA_INFO_BUFFERING_START:
+                whatName = "MEDIA_INFO_BUFFERING_START";
+                break;
+            case MEDIA_INFO_VIDEO_RENDERING_START:
+                whatName = "MEDIA_INFO_VIDEO_RENDERING_START";
+                break;
+            case MEDIA_INFO_VIDEO_TRACK_LAGGING:
+                whatName = "MEDIA_INFO_VIDEO_TRACK_LAGGING";
+                break;
+            default:
+                whatName = "MEDIA_INFO_UNKNOWN";
+                break;
+        }
+
+        switch (extra)
+        {
+            case MEDIA_INFO_BAD_INTERLEAVING:
+                extraName = "MEDIA_INFO_";
+                break;
+            case MEDIA_INFO_NOT_SEEKABLE:
+                extraName = "MEDIA_INFO_NOT_SEEKABLE";
+                break;
+            case MEDIA_INFO_METADATA_UPDATE:
+                extraName = "MEDIA_INFO_METADATA_UPDATE";
+                break;
+            case MEDIA_INFO_UNSUPPORTED_SUBTITLE:
+                extraName = "MEDIA_INFO_UNSUPPORTED_SUBTITLE";
+                break;
+            case MEDIA_INFO_SUBTITLE_TIMED_OUT:
+                extraName = "MEDIA_INFO_SUBTITLE_TIMED_OUT";
+                break;
+            default:
+                extraName = "MEDIA_INFO NOT KNOWN";
+                break;
+        }
+        Log.d(TAG, "onInfo WHAT" + whatName + "/ EXTRA : " + extraName);
+    }
+
+    public void showCompleteStats()
+    {
+        Toast.makeText(context.getApplicationContext(), playStats.showPlayStatsReport(), Toast.LENGTH_LONG).show();
+    }
+
+    public void showPausesStat()
+    {
+        Toast.makeText(context.getApplicationContext(), playStats.showPauses(), Toast.LENGTH_LONG).show();
+    }
+
+    public void showResumesStat()
+    {
+        Toast.makeText(context.getApplicationContext(), playStats.showResumes(), Toast.LENGTH_LONG).show();
     }
 
     public interface OnSeekListener
     {
-
         public void onSeek(MediaPlayer mp);
     }
 
@@ -250,171 +260,61 @@ public class NpawMediaPlayer extends MediaPlayer/* implements MediaController.Me
         this.mMediaController = mc;
     }
 
-    private void setMediaPlayerListeners()
+    public void setPreparedListener(NpawMediaPlayer.OnPreparedListener l)
     {
-//        mOnPreparedListener = new OnPreparedListener()
-//        {
-//            @Override
-//            public void onPrepared(MediaPlayer mp)
-//            {
-//                Log.w(TAG, "MediaPlayer onPrepared()");
-////                npawMplayerCallbacks.onPrepareMediaPlayerControl();
-//                mOnPrepareMediaPlayerControlListener.onPrepareMediaPlayerControl(NpawMediaPlayer.this);
-//            }
-//        };
-//
-//        setOnPreparedListener(mOnPreparedListener);
+        if (l != null)
+            this.mOnPreparedListener = l;
 
-        mOnSeekCompleteListener = new OnSeekCompleteListener()
-        {
-            @Override
-            public void onSeekComplete(MediaPlayer mp)
-            {
-                Log.i(TAG, "default OnSeekComplete()");
-            }
-        };
+        setOnPreparedListener(mOnPreparedListener);
+    }
+
+    public void setSeekCompleteListener(NpawMediaPlayer.OnSeekCompleteListener l)
+    {
+        if (l != null)
+            this.mOnSeekCompleteListener = l;
 
         setOnSeekCompleteListener(mOnSeekCompleteListener);
+    }
 
-        mOnCompletionListener = new OnCompletionListener()
-        {
-            @Override
-            public void onCompletion(MediaPlayer mp)
-            {
-                Log.i(TAG, "default onCompletion()");
-            }
-        };
+    public void setCompletionListener(NpawMediaPlayer.OnCompletionListener l)
+    {
+        if (l != null)
+            this.mOnCompletionListener = l;
 
         setOnCompletionListener(mOnCompletionListener);
+    }
 
-        mOnErrorListener = new OnErrorListener()
-        {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra)
-            {
-                Log.e(TAG, "default OnError()");
-                String whatName = "";
-                String extraName = "";
-
-                switch (what)
-                {
-                    case MEDIA_ERROR_SERVER_DIED:
-                        whatName = "MEDIA_ERROR_SERVER_DIED";
-                        break;
-                    case MEDIA_ERROR_UNKNOWN:
-                        whatName = "MEDIA_ERROR_DOWNLOAD";
-                        break;
-                    default:
-                        whatName = "NOT SPECIFIC ERROR";
-                        break;
-                }
-
-                switch (extra)
-                {
-                    case MEDIA_ERROR_IO:
-                        extraName = "MEDIA_ERROR_IO";
-                        break;
-                    case MEDIA_ERROR_MALFORMED:
-                        extraName = "MEDIA_ERROR_MALFORMED";
-                        break;
-                    case MEDIA_ERROR_TIMED_OUT:
-                        extraName = "MEDIA_ERROR_TIMED_OUT";
-                        break;
-                    case MEDIA_ERROR_UNSUPPORTED:
-                        extraName = "MEDIA_ERROR_UNSUPPORTED";
-                        break;
-                    default:
-                        extraName = "NOT SPECIFIC ERROR";
-                        break;
-                }
-
-                Toast.makeText(context.getApplicationContext(),
-                        "Cannot play the video, see logcat for the detailed exception",
-                        Toast.LENGTH_LONG).show();
-                Log.e(TAG, "what : " + whatName + "/ extra : " + extraName);
-
-//                mProgress.setVisibility(View.GONE);
-                mMediaController.setEnabled(false);
-                return true;
-            }
-        };
+    public void setErrorListener(NpawMediaPlayer.OnErrorListener l)
+    {
+        if (l != null)
+            this.mOnErrorListener = l;
 
         setOnErrorListener(mOnErrorListener);
+    }
 
-        mOnInfoListener = new OnInfoListener()
-        {
-            @Override
-            public boolean onInfo(MediaPlayer mp, int what, int extra)
-            {
-                String whatName = "";
-                String extraName = "";
-                switch (what)
-                {
-                    case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                        whatName = "MEDIA_INFO_BUFFERING_END";
-                        break;
-                    case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                        whatName = "MEDIA_INFO_BUFFERING_START";
-                        break;
-                    case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-                        whatName = "MEDIA_INFO_VIDEO_RENDERING_START";
-                        break;
-                    case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-                        whatName = "MEDIA_INFO_VIDEO_TRACK_LAGGING";
-                        break;
-                    default:
-                        whatName = "MEDIA_INFO_UNKNOWN";
-                        break;
-                }
-
-                switch (extra)
-                {
-                    case MEDIA_INFO_BAD_INTERLEAVING:
-                        extraName = "MEDIA_INFO_";
-                        break;
-                    case MEDIA_INFO_NOT_SEEKABLE:
-                        extraName = "MEDIA_INFO_NOT_SEEKABLE";
-                        break;
-                    case MEDIA_INFO_METADATA_UPDATE:
-                        extraName = "MEDIA_INFO_METADATA_UPDATE";
-                        break;
-                    case MEDIA_INFO_UNSUPPORTED_SUBTITLE:
-                        extraName = "MEDIA_INFO_UNSUPPORTED_SUBTITLE";
-                        break;
-                    case MEDIA_INFO_SUBTITLE_TIMED_OUT:
-                        extraName = "MEDIA_INFO_SUBTITLE_TIMED_OUT";
-                        break;
-                    default:
-                        extraName = "MEDIA_INFO NOT KNOWN";
-                        break;
-                }
-                Log.d(TAG, "onInfo WHAT" + whatName + "/ EXTRA : " + extraName);
-                return true;
-            }
-        };
+    public void setInfoListener(NpawMediaPlayer.OnInfoListener l)
+    {
+        if (l != null)
+            this.mOnInfoListener = l;
 
         setOnInfoListener(mOnInfoListener);
+    }
 
-        mOnBufferingUpdateListener = new OnBufferingUpdateListener()
-        {
-            @Override
-            public void onBufferingUpdate(MediaPlayer mp, int percent)
-            {
-                Log.i(TAG, "default onCompletion()");
-            }
-        };
+    public void setBufferingUpdateListener(NpawMediaPlayer.OnBufferingUpdateListener l)
+    {
+        if (l != null)
+            this.mOnBufferingUpdateListener = l;
 
         setOnBufferingUpdateListener(mOnBufferingUpdateListener);
+    }
 
-        mOnVideoSizeChangedListener = new OnVideoSizeChangedListener()
-        {
-            @Override
-            public void onVideoSizeChanged(MediaPlayer mp, int width, int height)
-            {
-                Log.i(TAG, "default onVideoSizeChanged()");
-            }
-        };
+    public void setVideoSizeChangedListener(NpawMediaPlayer.OnVideoSizeChangedListener l)
+    {
+        if (l != null)
+            this.mOnVideoSizeChangedListener = l;
 
         setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
     }
+
+
 }
