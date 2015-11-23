@@ -8,20 +8,34 @@ public class PlayStats
         resumes = 0;
     }
 
-    private double elapseTime;
+    public long getStartTime()
+    {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime)
+    {
+        this.startTime = startTime;
+    }
+
+    private long startTime;
+
+    private long elapseTime;
+
+    private long totalElapseTime;
 
     private long pauses;
 
     private long resumes;
 
-    public double getElapseTime()
+    public long getElapseTime()
     {
         return elapseTime;
     }
 
-    public void setElapseTime(int elapseTime)
+    public void setElapseTime(long elapseTime)
     {
-        this.elapseTime = elapseTime;
+        this.elapseTime += elapseTime;
     }
 
     public long getPauses()
@@ -56,14 +70,14 @@ public class PlayStats
 
     public String showPlayStatsReport()
     {
-        String statsReport = "Resumes amount : " + getResumes() + "\nPauses Amount : " + getPauses();
+        String statsReport = "Resumes amount : " + getResumes() + "\nPauses Amount : " + getPauses() + "\nTotal Elapse time : " + getTotalElapseTime());
 
         return statsReport;
     }
 
     public String showResumes()
     {
-        String resumes = "Resumes : " + getResumes();
+        String resumes = "Resumes : " + getResumes() + "\nElapse Time :" + getElapseTime();
 
         return resumes;
     }
@@ -73,5 +87,15 @@ public class PlayStats
         String pauses = "Pauses : " + getPauses();
 
         return pauses;
+    }
+
+    public long getTotalElapseTime()
+    {
+        return totalElapseTime;
+    }
+
+    public void setTotalElapseTime(long eTime)
+    {
+        this.totalElapseTime += eTime;
     }
 }

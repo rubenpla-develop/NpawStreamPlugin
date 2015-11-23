@@ -230,6 +230,18 @@ public class NpawMediaPlayer extends MediaPlayer
         Log.d(TAG, "onInfo WHAT" + whatName + "/ EXTRA : " + extraName);
     }
 
+    public void startTimeElapse()
+    {
+        playStats.setStartTime(System.nanoTime());
+    }
+
+    public long calculateElapsedTime()
+    {
+        playStats.setElapseTime(System.nanoTime() - playStats.getStartTime());
+        playStats.setTotalElapseTime(playStats.getElapseTime());
+        return System.nanoTime() - playStats.getStartTime();
+    }
+
     public void showCompleteStats()
     {
         Toast.makeText(context.getApplicationContext(), playStats.showPlayStatsReport(), Toast.LENGTH_LONG).show();
