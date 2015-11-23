@@ -2,6 +2,16 @@ package object;
 
 public class PlayStats
 {
+    private long startTime;
+
+    private long elapseTime;
+
+    private long totalElapseTime;
+
+    private long pauses;
+
+    private long resumes;
+
     public PlayStats()
     {
         pauses = 0;
@@ -18,15 +28,7 @@ public class PlayStats
         this.startTime = startTime;
     }
 
-    private long startTime;
 
-    private long elapseTime;
-
-    private long totalElapseTime;
-
-    private long pauses;
-
-    private long resumes;
 
     public long getElapseTime()
     {
@@ -70,7 +72,7 @@ public class PlayStats
 
     public String showPlayStatsReport()
     {
-        String statsReport = "Resumes amount : " + getResumes() + "\nPauses Amount : " + getPauses() + "\nTotal Elapse time : " + getTotalElapseTime());
+        String statsReport = "Resumes amount : " + getResumes() + "\nPauses Amount : " + getPauses() + "\nTotal Elapse time : " + getTotalElapseTime();
 
         return statsReport;
     }
