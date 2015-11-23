@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 
 import org.npawstreamer.npaw_streamer.activity.MediaPlayerActivity;
+import org.npawstreamer.npaw_streamer.activity.VideoViewActivity;
 import org.npawstreamer.npaw_streamer.utils.Const;
 
 import butterknife.Bind;
@@ -86,12 +87,14 @@ public class NpawActivity extends AppCompatActivity
                     .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
         } else if (code == 2)
         {
-            Log.i( TAG , "VideoView Lanzado");
-//            movieIntent = new Intent(this, VideoViewActivity.class)
-//                    .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
+            Log.i( TAG , "VideoView Activity");
+            movieIntent = new Intent(this, VideoViewActivity.class)
+                    .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
         }
 
-        startActivity(movieIntent);
+        //TODO temp, remove it
+        if (code ==1)
+            startActivity(movieIntent);
     }
 
     @OnClick(R.id.mp_button)
