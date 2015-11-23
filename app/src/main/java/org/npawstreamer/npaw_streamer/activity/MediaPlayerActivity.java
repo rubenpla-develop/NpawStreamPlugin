@@ -19,7 +19,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import view.NpawMediaPlayer;
 
-public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaPlayer.OnPreparedListener
+public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaPlayer.OnPreparedListener, NpawMediaPlayer.OnInfoListener, NpawMediaPlayer.OnErrorListener
 {
     final public static String TAG = MediaPlayerActivity.class.getSimpleName();
     private Context ctx;
@@ -30,7 +30,6 @@ public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaP
     private SurfaceHolder holder;
     private NpawMediaPlayer mediaPlayer;
     private MediaController mController;
-    private NpawMediaPlayer.onPrepareMediaPlayerControlListener mOnPrepareMediaControlListener;
     private MediaController.MediaPlayerControl mMediaPlayerControl;
     private Handler handler;
     private String videoUri;
@@ -60,12 +59,21 @@ public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaP
             public void start()
             {
                 mediaPlayer.start();
+                if (getCurrentPosition() > 0)
+                {
+                    mediaPlayer.getPlayStats().increaseResumes();
+                    mediaPlayer.showResumesStat();
+                    Log.i(TAG, "RESUMES : " + mediaPlayer.getPlayStats().getResumes());
+                }
             }
 
             @Override
             public void pause()
             {
                 mediaPlayer.pause();
+                mediaPlayer.getPlayStats().increasePauses();
+                mediaPlayer.showPausesStat();
+                Log.i(TAG, "PAUSES : " + mediaPlayer.getPlayStats().getPauses());
             }
 
             @Override
@@ -122,7 +130,18 @@ public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaP
                 return mediaPlayer.getAudioSessionId();
             }
         };
-        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setPreparedListener(this);
+        mediaPlayer.setErrorListener(this);
+        mediaPlayer.setInfoListener(this);
+        mediaPlayer.setCompletionListener(new MediaPlayer.OnCompletionListener()
+        {
+            @Override
+            public void onCompletion(MediaPlayer mp)
+            {
+                mediaPlayer.showCompleteStats();
+            }
+        });
+
         handler = new Handler();
 
         if (savedInstanceState != null)
@@ -212,5 +231,19 @@ public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaP
                 mController.show();
             }
         });
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra)
+    {
+        mediaPlayer.filterOnErrorListenerResult(what, extra);
+        return true;
+    }
+
+    @Override
+    public boolean onInfo(MediaPlayer mp, int what, int extra)
+    {
+        mediaPlayer.filterOnInfoListenerResult(what, extra);
+        return true;
     }
 }
