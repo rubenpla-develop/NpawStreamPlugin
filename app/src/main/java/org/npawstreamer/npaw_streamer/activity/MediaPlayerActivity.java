@@ -61,10 +61,10 @@ public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaP
                 mediaPlayer.start();
                 if (getCurrentPosition() > 0)
                 {
-                    mediaPlayer.getPlayStats().increaseResumes();
-                    mediaPlayer.getPlayStats().setStartTime(System.nanoTime());
+                    mediaPlayer.increaseResumes();
+                    mediaPlayer.setStartTime(System.nanoTime());
                     mediaPlayer.showResumesStat();
-                    Log.i(TAG, "RESUMES : " + mediaPlayer.getPlayStats().getResumes() + "\nElapse Time :" + mediaPlayer.calculateElapsedTime());
+                    Log.i(TAG, "RESUMES : " + mediaPlayer.getResumes() /*+ "\nElapse Time :" + mediaPlayer.calculateElapsedTime()*/);
                 }
             }
 
@@ -72,7 +72,7 @@ public class MediaPlayerActivity extends AppCompatActivity implements NpawMediaP
             public void pause()
             {
                 mediaPlayer.pause();
-                mediaPlayer.getPlayStats().increasePauses();
+                mediaPlayer.increasePauses();
                 mediaPlayer.showPausesStat();
                 mediaPlayer.startTimeElapse();
                 Log.i(TAG, "PAUSES : " + mediaPlayer.getPlayStats().getPauses());

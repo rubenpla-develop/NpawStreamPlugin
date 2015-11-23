@@ -136,6 +136,31 @@ public class NpawMediaPlayer extends MediaPlayer
         return playStats;
     }
 
+    public void increasePauses()
+    {
+        getPlayStats().increasePauses();
+    }
+
+    public void increaseResumes()
+    {
+        getPlayStats().increaseResumes();
+    }
+
+    public void setStartTime(long nanoTime)
+    {
+        getPlayStats().setStartTime(nanoTime);
+    }
+
+    public long getResumes()
+    {
+        return getPlayStats().getResumes();
+    }
+
+    public long getPauses()
+    {
+        return getPlayStats().getPauses();
+    }
+
     public void filterOnErrorListenerResult(int what, int extra)
     {
         Log.e(TAG, "default OnError()");
@@ -235,11 +260,11 @@ public class NpawMediaPlayer extends MediaPlayer
         playStats.setStartTime(System.nanoTime());
     }
 
-    public long calculateElapsedTime()
+    public double calculateElapsedTime()
     {
         playStats.setElapseTime(System.nanoTime() - playStats.getStartTime());
-        playStats.setTotalElapseTime(playStats.getElapseTime());
-        return System.nanoTime() - playStats.getStartTime();
+        playStats.setTotalElapseTime((long) playStats.getElapseTime());
+        return getPlayStats().getElapseTime();
     }
 
     public void showCompleteStats()
@@ -254,7 +279,8 @@ public class NpawMediaPlayer extends MediaPlayer
 
     public void showResumesStat()
     {
-        Toast.makeText(context.getApplicationContext(), playStats.showResumes(), Toast.LENGTH_LONG).show();
+        Toast.makeText(context.getApplicationContext(), playStats.showResumes() /*+ "\n" + "Elapsed Time : " + playStats.getElapseTime() + " seconds"*/, Toast.LENGTH_LONG)
+                .show();
     }
 
     public interface OnSeekListener
@@ -327,6 +353,4 @@ public class NpawMediaPlayer extends MediaPlayer
 
         setOnVideoSizeChangedListener(mOnVideoSizeChangedListener);
     }
-
-
 }
