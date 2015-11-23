@@ -4,9 +4,9 @@ public class PlayStats
 {
     private long startTime;
 
-    private long elapseTime;
+    private double elapseTime;
 
-    private long totalElapseTime;
+    private double totalElapseTime;
 
     private long pauses;
 
@@ -16,6 +16,9 @@ public class PlayStats
     {
         pauses = 0;
         resumes = 0;
+        startTime = 0;
+        elapseTime = 0;
+        totalElapseTime = 0;
     }
 
     public long getStartTime()
@@ -28,16 +31,14 @@ public class PlayStats
         this.startTime = startTime;
     }
 
-
-
-    public long getElapseTime()
+    public double getElapseTime()
     {
-        return elapseTime;
+        return elapseTime /1000000000.0;
     }
 
     public void setElapseTime(long elapseTime)
     {
-        this.elapseTime += elapseTime;
+        this.elapseTime = elapseTime;
     }
 
     public long getPauses()
@@ -91,13 +92,13 @@ public class PlayStats
         return pauses;
     }
 
-    public long getTotalElapseTime()
+    public double getTotalElapseTime()
     {
         return totalElapseTime;
     }
 
     public void setTotalElapseTime(long eTime)
     {
-        this.totalElapseTime += eTime;
+        this.totalElapseTime += (double)eTime / 1000000000.0;
     }
 }
