@@ -16,7 +16,6 @@ import org.npawstreamer.npaw_streamer.utils.Const;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import callbacks.NpawMediaPlayerCallbacks;
 import view.NpawMediaPlayer;
 import view.NpawVideoView;
 
@@ -36,7 +35,7 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
 
     private MediaController.MediaPlayerControl mMediaPlayerControl;
     private MediaController mMediaController;
-    private NpawMediaPlayerCallbacks videoViewCallBackListener;
+//    private NpawMediaPlayerCallbacks videoViewCallBackListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,40 +70,30 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
     {
         videoUri = uri;
 
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener()
+        mVideoView.setVideoSource(videoUri);
+
+        mVideoView.setPreparedListener(new MediaPlayer.OnPreparedListener()
         {
             @Override
             public void onPrepared(MediaPlayer mp)
             {
+                progressBar.setVisibility(View.GONE);
                 mVideoView.start();
-
-                progressBar.setVisibility(View.GONE);
-            }
-
-        });
-
-        mVideoView.getMediaPlayer().setErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                Toast.makeText(VideoViewActivity.this,
-                        "Cannot play the video, see logcat for the detailed exception",
-                        Toast.LENGTH_LONG).show();
-                progressBar.setVisibility(View.GONE);
-                mMediaController.setEnabled(false);
-                return true;
             }
         });
-        mVideoView.getMediaPlayer().setInfoListener(new MediaPlayer.OnInfoListener()
+
+        mVideoView.setErrorListener(this);
+        mVideoView.setInfoListener(new MediaPlayer.OnInfoListener()
         {
             @Override
             public boolean onInfo(MediaPlayer mp, int what, int extra)
             {
-                mVideoView.getMediaPlayer().filterOnInfoListenerResult(what, extra);
+                mVideoView.filterInfoListenerResult(what, extra);
                 return true;
             }
         });
 
-        mVideoView.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener()
+        mVideoView.setSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener()
         {
             @Override
             public void onSeekComplete(MediaPlayer mp)
@@ -113,7 +102,8 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
                 progressBar.setVisibility(View.GONE);
             }
         });
-        mVideoView.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener()
+
+        mVideoView.setBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener()
         {
             @Override
             public void onBufferingUpdate(MediaPlayer mp, int percent)
@@ -121,8 +111,6 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
                 Log.d(TAG, "onBufferingUpdate " + percent + "%");
             }
         });
-
-        mVideoView.setVideoSource(videoUri);
     }
 
     @Override
@@ -156,9 +144,9 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
         super.onSaveInstanceState(outState);
         if (videoUri != null)
         {
-//            outState.putString(Const.EXTRA_MOVIE_URL, videoUri);
-//            outState.putBoolean(Const.EXTRA_MOVIE_ISPLAYING, mVideoView.isPlaying());
-//            outState.putInt(Const.EXTRA_MOVIE_POSITION, mVideoView.getCurrentPosition());
+            outState.putString(Const.EXTRA_MOVIE_URL, videoUri);
+            outState.putBoolean(Const.EXTRA_MOVIE_ISPLAYING, mVideoView.isPlaying());
+            outState.putInt(Const.EXTRA_MOVIE_POSITION, mVideoView.getCurrentPosition());
         }
     }
 
@@ -178,16 +166,19 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
     public boolean onTouchEvent(MotionEvent event)
     {
         Log.d(TAG, "surfaceHolder.callBack.onTouchEvent()");
-       mMediaController.show();
+        mMediaController.show();
         return false;
     }
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra)
     {
-        videoViewCallBackListener.mpErrorFilterResult(what, extra);
+        Toast.makeText(VideoViewActivity.this,
+                "Cannot play the video, see logcat for the detailed exception",
+                Toast.LENGTH_LONG).show();
+        mVideoView.filterErrorListenerResult(what, extra);
+        progressBar.setVisibility(View.GONE);
+        mMediaController.setEnabled(false);
         return true;
     }
-
-
 }

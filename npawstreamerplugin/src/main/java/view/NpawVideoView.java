@@ -8,6 +8,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.MediaController;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 
 public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback, android.widget.MediaController.MediaPlayerControl
 {
@@ -18,8 +21,8 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
     private MediaController mMediaController;
     private SurfaceHolder mSurfaceHolder;
     private String videoUrl;
-    private int mVideoWidth;
-    private int mVideoHeight;
+//    private int mVideoWidth;
+//    private int mVideoHeight;
 
     public NpawVideoView(Context context)
     {
@@ -68,9 +71,42 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
         }
 
         mPlayer = new NpawMediaPlayer();
-        mPlayer.initMediaPlayer(mContext, videoUrl);
+        //mPlayer.initMediaPlayer(mContext, videoUrl);
         mPlayer.setDisplay(mSurfaceHolder);
         mPlayer.setMediaPlayerAdjustements();
+
+        try
+        {
+            mPlayer.setDataSource(videoUrl);
+        } catch (IOException e)
+        {
+            Log.e(TAG, "setDataSource exception: " + Arrays.toString(e.getStackTrace()));
+        }
+
+//        // Set the data source asynchronously as this might take a while, e.g. is data has to be
+//        // requested from the network/internet.
+//        new AsyncTask<Void, Void, Void>() {
+//            private IOException mException;
+//
+//            @Override
+//            protected Void doInBackground(Void... params) {
+//                try {
+//                    mPlayer.setDataSource(videoUrl);
+//                    Log.d(TAG, "video opened");
+//                } catch (IOException e) {
+//                    Log.e(TAG, "video open failed", e);
+//                    mException = e;
+//                }
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                if(mException != null) {
+//                    mPlayer.mOnErrorListener.onError(mPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
+//                }
+//            }
+//        }.execute();
     }
 
     public NpawMediaPlayer getMediaPlayer()
@@ -78,12 +114,20 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
         return mPlayer;
     }
 
+    public MediaController.MediaPlayerControl getMediaPlayerControl()
+    {
+        MediaController.MediaPlayerControl mpc = this;
+        return mpc;
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
         mSurfaceHolder = holder;
         launchVideo();
-        mPlayer.prepareAsync();
+        //            getMediaPlayer().setDataSource(videoUrl);
+//        mPlayer.prepareAsync();
+
     }
 
     @Override
@@ -107,6 +151,14 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
     public void start()
     {
         mPlayer.start();
+
+        if (mPlayer.getCurrentPosition() > 0)
+        {
+            mPlayer.increaseResumes();
+            mPlayer.setStartTime(System.nanoTime());
+            mPlayer.showResumesStat();
+            Log.i(TAG, "RESUMES : " + mPlayer.getResumes() /*+ "\nElapse Time :" + mediaPlayer.calculateElapsedTime()*/);
+        }
     }
 
     @Override
@@ -175,41 +227,50 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
 
     public void setErrorListener(MediaPlayer.OnErrorListener l)
     {
-        getMediaPlayer().setErrorListener(l);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().setErrorListener(l);
     }
 
     public void setPreparedListener(MediaPlayer.OnPreparedListener l)
     {
-        getMediaPlayer().setPreparedListener(l);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().setPreparedListener(l);
     }
 
     public void setInfoListener(MediaPlayer.OnInfoListener l)
     {
-        getMediaPlayer().setInfoListener(l);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().setInfoListener(l);
     }
 
     public void setSeekCompleteListener(MediaPlayer.OnSeekCompleteListener l)
     {
-        getMediaPlayer().setSeekCompleteListener(l);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().setSeekCompleteListener(l);
     }
 
     public void setBufferingUpdateListener(MediaPlayer.OnBufferingUpdateListener l)
     {
-        getMediaPlayer().setBufferingUpdateListener(l);
+
+        if (getMediaPlayer() != null)
+            getMediaPlayer().setBufferingUpdateListener(l);
     }
 
     public void setVideoSizeChangedListener(MediaPlayer.OnVideoSizeChangedListener l)
     {
-        getMediaPlayer().setVideoSizeChangedListener(l);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().setVideoSizeChangedListener(l);
     }
 
     public void filterErrorListenerResult(int what, int extra)
     {
-        getMediaPlayer().filterOnErrorListenerResult(what, extra);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().filterOnErrorListenerResult(what, extra);
     }
 
     public void filterInfoListenerResult(int what, int extra)
     {
-        getMediaPlayer().filterOnInfoListenerResult(what, extra);
+        if (getMediaPlayer() != null)
+            getMediaPlayer().filterOnInfoListenerResult(what, extra);
     }
 }
