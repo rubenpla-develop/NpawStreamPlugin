@@ -181,4 +181,8 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
         mMediaController.setEnabled(false);
         return true;
     }
+
+
+
+
 }

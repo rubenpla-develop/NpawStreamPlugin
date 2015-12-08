@@ -92,8 +92,8 @@ public class NpawActivity extends AppCompatActivity
                     .putExtra(Const.EXTRA_MOVIE_PARAM, urlMovie);
         }
 
-        //TODO temp, remove it
-        if (code ==1)
+//        //TODO temp, remove it
+//        if (code ==1)
             startActivity(movieIntent);
     }
 
