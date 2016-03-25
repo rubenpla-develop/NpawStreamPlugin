@@ -17,7 +17,7 @@ import org.npawstreamer.npaw_streamer.utils.Const;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import View.NpawMediaPlayer;
-import View.NpawVideoView;
+import View.NPAWVideoView;
 
 public class VideoViewActivity extends AppCompatActivity implements NpawMediaPlayer.OnErrorListener
 {
@@ -26,16 +26,13 @@ public class VideoViewActivity extends AppCompatActivity implements NpawMediaPla
     String videoUri;
 
     @Bind(R.id.view_video)
-    NpawVideoView mVideoView;
+    NPAWVideoView mVideoView;
 
     @Bind(R.id.vv_progressbar)
     ProgressBar progressBar;
 
-//    private ProgressBar progressBar;
-
     private MediaController.MediaPlayerControl mMediaPlayerControl;
     private MediaController mMediaController;
-//    private NpawMediaPlayerCallbacks videoViewCallBackListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
