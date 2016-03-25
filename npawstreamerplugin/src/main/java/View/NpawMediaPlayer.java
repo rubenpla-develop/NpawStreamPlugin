@@ -1,4 +1,4 @@
-package view;
+package View;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -9,7 +9,7 @@ import android.view.SurfaceHolder;
 import android.widget.MediaController;
 import android.widget.Toast;
 
-import object.PlayStats;
+import Object.PlayStats;
 
 /**
  * Created by Ruben on 16/11/2015.

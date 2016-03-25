@@ -1,4 +1,4 @@
-package object;
+package Object;
 
 public class PlayStats
 {

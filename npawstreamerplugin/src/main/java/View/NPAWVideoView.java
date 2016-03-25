@@ -1,18 +1,22 @@
-package view;
+package View;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.MediaController;
+import android.widget.VideoView;
 
 import java.io.IOException;
 
-
-public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback, android.widget.MediaController.MediaPlayerControl
+/**
+ * Created by ruben on 25/03/16.
+ */
+public class NPAWVideoView extends VideoView implements SurfaceHolder.Callback, android.widget.MediaController.MediaPlayerControl
 {
     private static final String TAG = NpawVideoView.class.getSimpleName();
     private Context mContext;
@@ -24,24 +28,24 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
     private int mVideoWidth;
     private int mVideoHeight;
 
-    public NpawVideoView(Context context)
-    {
+    public NPAWVideoView(Context context) {
         super(context);
-        mContext = context;
         init();
     }
 
-    public NpawVideoView(Context context, AttributeSet attrs)
-    {
+    public NPAWVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
         init();
     }
 
-    public NpawVideoView(Context context, AttributeSet attrs, int defStyleAttr)
-    {
+    public NPAWVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
+        init();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public NPAWVideoView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }
 
@@ -157,74 +161,6 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
-    /**
-     * Resizes the video view according to the video size to keep aspect ratio.
-     * Code copied from {@link android.widget.VideoView#onMeasure(int, int)}.
-     */
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        //Log.i("@@@@", "onMeasure(" + MeasureSpec.toString(widthMeasureSpec) + ", "
-        //        + MeasureSpec.toString(heightMeasureSpec) + ")");
-
-        int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
-        int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
-        if (mVideoWidth > 0 && mVideoHeight > 0) {
-
-            int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-            int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-            int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-            int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
-
-            if (widthSpecMode == MeasureSpec.EXACTLY && heightSpecMode == MeasureSpec.EXACTLY) {
-                // the size is fixed
-                width = widthSpecSize;
-                height = heightSpecSize;
-
-                // for compatibility, we adjust size based on aspect ratio
-                if ( mVideoWidth * height  < width * mVideoHeight ) {
-                    //Log.i("@@@", "image too wide, correcting");
-                    width = height * mVideoWidth / mVideoHeight;
-                } else if ( mVideoWidth * height  > width * mVideoHeight ) {
-                    //Log.i("@@@", "image too tall, correcting");
-                    height = width * mVideoHeight / mVideoWidth;
-                }
-            } else if (widthSpecMode == MeasureSpec.EXACTLY) {
-                // only the width is fixed, adjust the height to match aspect ratio if possible
-                width = widthSpecSize;
-                height = width * mVideoHeight / mVideoWidth;
-                if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
-                    // couldn't match aspect ratio within the constraints
-                    height = heightSpecSize;
-                }
-            } else if (heightSpecMode == MeasureSpec.EXACTLY) {
-                // only the height is fixed, adjust the width to match aspect ratio if possible
-                height = heightSpecSize;
-                width = height * mVideoWidth / mVideoHeight;
-                if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
-                    // couldn't match aspect ratio within the constraints
-                    width = widthSpecSize;
-                }
-            } else {
-                // neither the width nor the height are fixed, try to use actual video size
-                width = mVideoWidth;
-                height = mVideoHeight;
-                if (heightSpecMode == MeasureSpec.AT_MOST && height > heightSpecSize) {
-                    // too tall, decrease both width and height
-                    height = heightSpecSize;
-                    width = height * mVideoWidth / mVideoHeight;
-                }
-                if (widthSpecMode == MeasureSpec.AT_MOST && width > widthSpecSize) {
-                    // too wide, decrease both width and height
-                    width = widthSpecSize;
-                    height = width * mVideoHeight / mVideoWidth;
-                }
-            }
-        } else {
-            // no size yet, just adopt the given spec sizes
-        }
-        setMeasuredDimension(width, height);
-    }
-
     @Override
     public void start()
     {
@@ -305,50 +241,50 @@ public class NpawVideoView extends SurfaceView implements SurfaceHolder.Callback
 
     public void setErrorListener(MediaPlayer.OnErrorListener l)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().setErrorListener(l);
+        if (mPlayer != null)
+            mPlayer.setErrorListener(l);
     }
 
     public void setPreparedListener(MediaPlayer.OnPreparedListener l)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().setPreparedListener(l);
+        if (mPlayer != null)
+            mPlayer.setPreparedListener(l);
     }
 
     public void setInfoListener(MediaPlayer.OnInfoListener l)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().setInfoListener(l);
+        if (mPlayer != null)
+            mPlayer.setInfoListener(l);
     }
 
     public void setSeekCompleteListener(MediaPlayer.OnSeekCompleteListener l)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().setSeekCompleteListener(l);
+        if (mPlayer != null)
+            mPlayer.setSeekCompleteListener(l);
     }
 
     public void setBufferingUpdateListener(MediaPlayer.OnBufferingUpdateListener l)
     {
 
-        if (getMediaPlayer() != null)
-            getMediaPlayer().setBufferingUpdateListener(l);
+        if (mPlayer != null)
+            mPlayer.setBufferingUpdateListener(l);
     }
 
     public void setVideoSizeChangedListener(MediaPlayer.OnVideoSizeChangedListener l)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().setVideoSizeChangedListener(l);
+        if (mPlayer != null)
+            mPlayer.setVideoSizeChangedListener(l);
     }
 
     public void filterErrorListenerResult(int what, int extra)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().filterOnErrorListenerResult(what, extra);
+        if (mPlayer != null)
+            mPlayer.filterOnErrorListenerResult(what, extra);
     }
 
     public void filterInfoListenerResult(int what, int extra)
     {
-        if (getMediaPlayer() != null)
-            getMediaPlayer().filterOnInfoListenerResult(what, extra);
+        if (mPlayer != null)
+            mPlayer.filterOnInfoListenerResult(what, extra);
     }
 }

@@ -16,8 +16,8 @@ import org.npawstreamer.npaw_streamer.utils.Const;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import view.NpawMediaPlayer;
-import view.NpawVideoView;
+import View.NpawMediaPlayer;
+import View.NpawVideoView;
 
 public class VideoViewActivity extends AppCompatActivity implements NpawMediaPlayer.OnErrorListener
 {
