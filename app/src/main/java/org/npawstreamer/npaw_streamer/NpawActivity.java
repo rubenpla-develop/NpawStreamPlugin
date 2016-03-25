@@ -24,6 +24,8 @@ public class NpawActivity extends AppCompatActivity
     @Bind(R.id.mp_button) Button mpButton;
     @Bind(R.id.vv_button) Button vvButton;
 
+    
+
     private final int MEDIA_PLAYER_CODE = 1;
     private final int VIDEO_VIEW_CODE = 2;
 
